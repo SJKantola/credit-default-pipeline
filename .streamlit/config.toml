@@ -1,0 +1,2 @@
+[runner]
+requirementsFile = "requirements-dashboard.txt"
