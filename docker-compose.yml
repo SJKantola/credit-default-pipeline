@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    container_name: credit-api
+    environment:
+      - SERVICE=api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  dashboard:
+    build: .
+    container_name: credit-dashboard
+    environment:
+      - SERVICE=dashboard
+    ports:
+      - "8501:8501"
+    restart: unless-stopped

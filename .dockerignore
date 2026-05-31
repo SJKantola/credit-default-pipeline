@@ -1,0 +1,26 @@
+# Git files
+.git
+.gitignore
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+
+# Virtual environment
+venv
+.env
+
+# Editor config
+.vscode
+.idea
+
+# Model binaries (they'll be rebuilt if needed, but we already have them in models/)
+# Actually we need the models inside the container, so don't ignore them.
+# But we will ignore the raw dataset if it's huge? No, it's small, keep it.
+
+# Documentation
+README.md
+notebooks/
