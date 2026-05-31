@@ -97,6 +97,11 @@ Assumptions: False Negative = €5,000 cost, False Positive = €1,000 cost.
 
 > The API is hosted on Render (free tier) and may take 30‑50 seconds to start after inactivity. The dashboard is on Streamlit Cloud.
 
+## Monitoring & Explainability
+
+- **Data Drift Report**: [View latest drift analysis](https://htmlpreview.github.io/?https://raw.githubusercontent.com/SJKantola/credit-default-pipeline/master/data/processed/drift_report.html) (Evidently AI)
+- **Model Explainability**: The [live dashboard](https://credit-default-pipeline-n6gmizwwshmywhfcaqeznd.streamlit.app) includes a **SHAP explainability tab** showing how each feature contributes to an individual prediction.
+- **CI/CD**: Every push runs the test suite automatically via [GitHub Actions](https://github.com/SJKantola/credit-default-pipeline/actions)
 
 ## Testing
 ```bash
