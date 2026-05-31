@@ -115,6 +115,9 @@ python -m pytest tests/ -v
 - Streamlit
 - matplotlib, seaborn
 - pytest
+- Docker, Render, Streamlit Cloud
+- Evidently AI, SHAP
+- GitHub Actions (CI/CD)
 - Git (self‑hosted, SSH/WireGuard)
 
 ## Author
