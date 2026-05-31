@@ -1,0 +1,35 @@
+{
+  "model": "XGBoost",
+  "version": "1.0.0",
+  "date": "2026-05-31T03:19:36.996540",
+  "dataset": "UCI Credit Card Default (30k records)",
+  "preprocessing": "StandardScaler on all numeric features, SMOTE on training set",
+  "hyperparameters": {
+    "subsample": 0.9,
+    "reg_lambda": 0,
+    "reg_alpha": 0.01,
+    "n_estimators": 200,
+    "max_depth": 8,
+    "learning_rate": 0.1,
+    "colsample_bytree": 0.9,
+    "eval_metric": "logloss",
+    "random_state": 42
+  },
+  "test_metrics": {
+    "accuracy": 0.802,
+    "precision": 0.5720221606648199,
+    "recall": 0.4150753768844221,
+    "roc_auc": 0.7535609574262181,
+    "confusion_matrix": [
+      [
+        3196,
+        309
+      ],
+      [
+        582,
+        413
+      ]
+    ]
+  },
+  "business_savings_percent": 35.3
+}
