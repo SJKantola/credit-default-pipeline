@@ -135,17 +135,42 @@ with tab2:
 # ---------- Tab 3: Feature Importance ----------
 with tab3:
     st.header("Feature Importance (XGBoost Gain)")
-    importance = model.get_booster().get_score(importance_type='gain')
-    # Map f-keys to original names
-    feature_names = scaler.feature_names_in_
+    
+    # Get importance scores
+    booster = model.get_booster()
+    importance = booster.get_score(importance_type='gain')
+    
+    # Get the feature names the model was trained with
+    # The scaler's feature_names_in_ holds the column names after feature engineering
+    feature_names = list(scaler.feature_names_in_)
+    
+    # Map importance keys to feature names
     importance_mapped = {}
     for k, v in importance.items():
-        idx = int(k.replace('f', ''))
-        importance_mapped[feature_names[idx]] = v
-    imp_df = pd.DataFrame({"Feature": list(importance_mapped.keys()), "Importance": list(importance_mapped.values())})
-    imp_df = imp_df.sort_values("Importance", ascending=False).head(20)
+        # If the key is like 'f0', 'f1', etc., convert to integer index
+        if k.startswith('f'):
+            try:
+                idx = int(k[1:])  # remove 'f' and convert to int
+                if idx < len(feature_names):
+                    importance_mapped[feature_names[idx]] = v
+                else:
+                    # fallback: keep original key if index out of range
+                    importance_mapped[k] = v
+            except ValueError:
+                # key is not a simple 'f'+number, use as is
+                importance_mapped[k] = v
+        else:
+            # already a named feature
+            importance_mapped[k] = v
 
-    fig, ax = plt.subplots(figsize=(10,6))
+    # Build dataframe and sort
+    imp_df = pd.DataFrame({
+        "Feature": list(importance_mapped.keys()),
+        "Importance": list(importance_mapped.values())
+    }).sort_values("Importance", ascending=False).head(20)
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(10, 6))
     sns.barplot(data=imp_df, y="Feature", x="Importance", palette="viridis", ax=ax)
     ax.set_title("Top 20 Feature Importances (gain)")
     st.pyplot(fig)
