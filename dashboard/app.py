@@ -26,7 +26,12 @@ with open(MODEL_DIR / "model_card.json") as f:
     model_card = json.load(f)
 
 # ---------- Tabs ----------
-tab1, tab2, tab3 = st.tabs(["📈 Model Performance", "🧪 Try a Prediction", "🌲 Feature Importance"])
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📈 Model Performance",
+    "🧪 Try a Prediction",
+    "🌲 Feature Importance",
+    "⚡ SHAP Explainability"
+])
 
 # ---------- Tab 1: Performance ----------
 with tab1:
