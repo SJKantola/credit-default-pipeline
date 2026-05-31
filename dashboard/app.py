@@ -176,33 +176,39 @@ with tab3:
     st.pyplot(fig)
 
 # ---------- Tab 4: SHAP Explainability ----------
-with st.expander("⚡ SHAP Explainability (Why did the model decide this?)", expanded=False):
-    st.write("SHAP values show how much each feature contributed to the prediction for a specific applicant.")
-    
-    # We'll use the same input as Tab 2 (if already filled) or a separate form
-    # For simplicity, let's add a small form inside this tab
+with tab4:
+    st.header("⚡ SHAP Explainability (Why this prediction?)")
+    st.markdown("""
+    SHAP values show how much each feature contributed to pushing the prediction
+    away from the average. Positive values push towards **Default**, negative towards
+    **No Default**.
+    """)
+
     with st.form("shap_form"):
         col1, col2, col3 = st.columns(3)
         with col1:
-            credit_limit_shap = st.number_input("Credit Limit", 10000, 1000000, 200000)
-            sex_shap = st.selectbox("Sex (0=Male, 1=Female)", [0, 1])
+            credit_limit_shap = st.number_input("Credit Limit", min_value=10000, value=200000, step=50000)
+            sex_shap = st.selectbox("Sex", [0, 1], format_func=lambda x: "Male" if x==0 else "Female")
             education_shap = st.selectbox("Education", [1,2,3,4], format_func=lambda x: ["Graduate","University","High School","Others"][x-1])
-        with col2:
-            pay_sept_shap = st.selectbox("Payment Status Sept", [-2,-1,0,1,2,3,4,5,6,7,8])
-            pay_aug_shap = st.selectbox("Payment Status Aug", [-2,-1,0,1,2,3,4,5,6,7,8])
-            pay_jul_shap = st.selectbox("Payment Status Jul", [-2,-1,0,1,2,3,4,5,6,7,8])
-        with col3:
             age_shap = st.slider("Age", 21, 80, 35)
+        with col2:
+            pay_sept_shap = st.selectbox("Pay Status Sept", [-2,-1,0,1,2,3,4,5,6,7,8], index=2)
+            pay_aug_shap = st.selectbox("Pay Status Aug", [-2,-1,0,1,2,3,4,5,6,7,8], index=2)
+            pay_jul_shap = st.selectbox("Pay Status Jul", [-2,-1,0,1,2,3,4,5,6,7,8], index=2)
+        with col3:
             bill_sept_shap = st.number_input("Bill Sept", value=0)
+            bill_aug_shap = st.number_input("Bill Aug", value=0)
+            pay_sept_amt_shap = st.number_input("Paid Sept", value=0)
         submitted_shap = st.form_submit_button("Explain Prediction")
-    
+
     if submitted_shap:
-        # Build input exactly as in Tab 2
+        import shap
+        # Build input exactly as in Tab 2 (use default values for missing features)
         input_data = {
             "credit_limit": credit_limit_shap,
             "sex": sex_shap,
             "education": education_shap,
-            "marital_status": 2,  # default
+            "marital_status": 2,
             "age": age_shap,
             "pay_status_sept": pay_sept_shap,
             "pay_status_aug": pay_aug_shap,
@@ -211,12 +217,12 @@ with st.expander("⚡ SHAP Explainability (Why did the model decide this?)", exp
             "pay_status_may": 0,
             "pay_status_apr": 0,
             "bill_amt_sept": bill_sept_shap,
-            "bill_amt_aug": 0,
+            "bill_amt_aug": bill_aug_shap,
             "bill_amt_jul": 0,
             "bill_amt_jun": 0,
             "bill_amt_may": 0,
             "bill_amt_apr": 0,
-            "pay_amt_sept": 0,
+            "pay_amt_sept": pay_sept_amt_shap,
             "pay_amt_aug": 0,
             "pay_amt_jul": 0,
             "pay_amt_jun": 0,
@@ -228,13 +234,12 @@ with st.expander("⚡ SHAP Explainability (Why did the model decide this?)", exp
         expected_cols = scaler.feature_names_in_
         df_feat = df_feat[expected_cols]
         scaled = scaler.transform(df_feat)
-        
-        # Get SHAP values
-        import shap
+
+        # Create SHAP explainer
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(scaled)
-        
-        # Waterfall plot for the first (only) sample
+
+        # Waterfall plot for the single prediction
         fig, ax = plt.subplots(figsize=(10, 6))
         shap.waterfall_plot(
             shap.Explanation(
@@ -246,4 +251,8 @@ with st.expander("⚡ SHAP Explainability (Why did the model decide this?)", exp
             show=False
         )
         st.pyplot(fig)
-        st.write("The waterfall chart shows how each feature pushed the prediction from the base value (average).")
+
+        proba = model.predict_proba(scaled)[0, 1]
+        st.metric("Default Probability", f"{proba:.2%}")
+        st.caption("The waterfall chart above shows how each feature moved the prediction from the base value "
+                   "(average log-odds) to the final prediction. Red = increased default risk, blue = decreased.")
