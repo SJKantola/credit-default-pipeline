@@ -174,3 +174,76 @@ with tab3:
     sns.barplot(data=imp_df, y="Feature", x="Importance", palette="viridis", ax=ax)
     ax.set_title("Top 20 Feature Importances (gain)")
     st.pyplot(fig)
+
+# ---------- Tab 4: SHAP Explainability ----------
+with st.expander("⚡ SHAP Explainability (Why did the model decide this?)", expanded=False):
+    st.write("SHAP values show how much each feature contributed to the prediction for a specific applicant.")
+    
+    # We'll use the same input as Tab 2 (if already filled) or a separate form
+    # For simplicity, let's add a small form inside this tab
+    with st.form("shap_form"):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            credit_limit_shap = st.number_input("Credit Limit", 10000, 1000000, 200000)
+            sex_shap = st.selectbox("Sex (0=Male, 1=Female)", [0, 1])
+            education_shap = st.selectbox("Education", [1,2,3,4], format_func=lambda x: ["Graduate","University","High School","Others"][x-1])
+        with col2:
+            pay_sept_shap = st.selectbox("Payment Status Sept", [-2,-1,0,1,2,3,4,5,6,7,8])
+            pay_aug_shap = st.selectbox("Payment Status Aug", [-2,-1,0,1,2,3,4,5,6,7,8])
+            pay_jul_shap = st.selectbox("Payment Status Jul", [-2,-1,0,1,2,3,4,5,6,7,8])
+        with col3:
+            age_shap = st.slider("Age", 21, 80, 35)
+            bill_sept_shap = st.number_input("Bill Sept", value=0)
+        submitted_shap = st.form_submit_button("Explain Prediction")
+    
+    if submitted_shap:
+        # Build input exactly as in Tab 2
+        input_data = {
+            "credit_limit": credit_limit_shap,
+            "sex": sex_shap,
+            "education": education_shap,
+            "marital_status": 2,  # default
+            "age": age_shap,
+            "pay_status_sept": pay_sept_shap,
+            "pay_status_aug": pay_aug_shap,
+            "pay_status_jul": pay_jul_shap,
+            "pay_status_jun": 0,
+            "pay_status_may": 0,
+            "pay_status_apr": 0,
+            "bill_amt_sept": bill_sept_shap,
+            "bill_amt_aug": 0,
+            "bill_amt_jul": 0,
+            "bill_amt_jun": 0,
+            "bill_amt_may": 0,
+            "bill_amt_apr": 0,
+            "pay_amt_sept": 0,
+            "pay_amt_aug": 0,
+            "pay_amt_jul": 0,
+            "pay_amt_jun": 0,
+            "pay_amt_may": 0,
+            "pay_amt_apr": 0
+        }
+        df_input = pd.DataFrame([input_data])
+        df_feat, _ = engineer_features(df_input, None)
+        expected_cols = scaler.feature_names_in_
+        df_feat = df_feat[expected_cols]
+        scaled = scaler.transform(df_feat)
+        
+        # Get SHAP values
+        import shap
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer.shap_values(scaled)
+        
+        # Waterfall plot for the first (only) sample
+        fig, ax = plt.subplots(figsize=(10, 6))
+        shap.waterfall_plot(
+            shap.Explanation(
+                values=shap_values[0],
+                base_values=explainer.expected_value,
+                data=scaled[0],
+                feature_names=expected_cols
+            ),
+            show=False
+        )
+        st.pyplot(fig)
+        st.write("The waterfall chart shows how each feature pushed the prediction from the base value (average).")
