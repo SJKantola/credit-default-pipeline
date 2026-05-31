@@ -88,6 +88,16 @@ Assumptions: False Negative = €5,000 cost, False Positive = €1,000 cost.
    streamlit run dashboard/app.py
    ```
 
+## Live Deployment
+
+| Service | URL |
+|---------|-----|
+| **REST API (Swagger UI)** | [https://credit-default-api-y97j.onrender.com/docs](https://credit-default-api-y97j.onrender.com/docs) |
+| **Interactive Dashboard** | [https://credit-default-pipeline-n6gmizwwshmywhfcaqeznd.streamlit.app](https://credit-default-pipeline-n6gmizwwshmywhfcaqeznd.streamlit.app) |
+
+> The API is hosted on Render (free tier) and may take 30‑50 seconds to start after inactivity. The dashboard is on Streamlit Cloud.
+
+
 ## Testing
 ```bash
 python -m pytest tests/ -v
@@ -103,4 +113,6 @@ python -m pytest tests/ -v
 - Git (self‑hosted, SSH/WireGuard)
 
 ## Author
-[Your Name] – [Link to LinkedIn/GitHub if desired]
+S.J. Kantola
+https://www.linkedin.com/in/s-j-kantola-76747a269/
+https://github.com/SJKantola
